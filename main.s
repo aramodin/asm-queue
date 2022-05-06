@@ -27,28 +27,30 @@ _start:
 #	mov %rax, %r8	# запомнить адрес начала выделяемой памяти
 ###############################################################
 
-	mov $msg, %rsi
-	#call print
-	mov $'?', %dl
-	mov %dl, msg+11
 	#mov $msg, %rsi
+	#call print
+	#mov $'?', %dl
+	#mov %dl, msg+11
+	##mov $msg, %rsi
 	#call println
 
-	call get
-	mov $18, %rdi
-	call put
-	inc %rdi
-	call put
-	inc %rdi
-	call put
+#
+#	call get
+#	mov $18, %rdi
+#	call put
+#	inc %rdi
+#	call put
+#	inc %rdi
+#	call put
+#
+#
+#	mov $0x1313, %rdi
+#	call get
+#	call get
+#	call get
+#	call get
 
-
-	mov $0x1313, %rdi
-	call get
-	call get
-	call get
-	call get
-
+	call test_memory
 exit:
 	mov $60, %rax		# exit
 	xor %rdi, %rdi		# exit code = 0

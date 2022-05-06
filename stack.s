@@ -27,13 +27,8 @@ put_exit:
     pop %rsi
     ret
 
-# БАГА
-# 0
-# 14
-# 13
-
 .global get
-get:        # %rax - '-1' error / '0' ok ; %rdi - the value from stack 
+get:        # %rax - '-1' error / '0' ok ; %rdx - the value from stack 
     xor %rax, %rax
     movb stackcount, %al
     cmp $0, %al
@@ -43,7 +38,7 @@ get:        # %rax - '-1' error / '0' ok ; %rdi - the value from stack
     movb %al, stackcount
     mov $stackbuf, %rdi
     add %rdi, %rax
-    mov (%rax), %rdi
+    mov (%rax), %rdx
     xor %rax, %rax
     jmp get_exit
 get_error:
