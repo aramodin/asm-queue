@@ -3,7 +3,7 @@
 greetings:
 	.asciz "\nHello! :)\n\nЛабораторная работа номер 2 (класс стэк)\n\n"
 menu:
-	.asciz "1. Добавить в список(add)\n2. Найти элемент(find)\n3. Отсортировать(sort)\n4. Распечатать(print)\n0. Выход(exit)\n>"
+	.asciz "1. Добавить в список(add)\n2. Найти элемент(find)\n3. Отсортировать(sort)\n4. Распечатать(print)\n0. Выход(exit)\n> "
 separate_line:
     .asciz "-------------------------\n"
 menu_1:
@@ -55,8 +55,6 @@ main_loop:
     mov  $255, %rdi   # длина буфера
     lea  buf,  %rsi   # адрес буфера
     call read
-#    lea  buf, %rdi
-#    call str2int
     cmpb $'0', (%rsi)
     jz bye
     cmpb $'1', (%rsi)
@@ -64,7 +62,6 @@ main_loop:
     cmpb $'4', (%rsi)
     jz print_all
     jmp main_loop
-
 
 
 bye:
@@ -110,27 +107,14 @@ print_all:
     lea menu_4,         %rdi
     call print
 
-    movq (head), %rax
-    cmp $0, %rax
+    movq (head), %rdi
+    cmp $0, %rdi
     jz print_all_empty
 print_all_loop:
-    lea tmpname,    %rsi    # name
-    add $16,        %rax
-    mov %rax,       %rdi
-    call str_cpy
-
-    lea tmpjanr,    %rsi    # janr
-    add $256,       %rax
-    mov %rax,       %rdi
-
-    lea tmpyear,    %rsi    # year
-    add $256,       %rax
-    mov %rax,       %rdi
-    call str_cpy
-
     call print_one_record
-    movq (head), %rsi
-    movq (%rsi), %rax
+    mov %rdi, %rax
+    movq (%rax),  %rdi
+    cmp $0, %rdi
     jnz print_all_loop
 
     jmp print_all_exit
@@ -144,20 +128,28 @@ print_all_exit:
     jmp main_loop
 
 print_one_record:
+    push %rdi
+    push %rdi
     lea name,    %rdi
     call print
-    lea tmpname, %rdi
+    pop %rdi
+    add $16, %rdi
     call print
     
+    push %rdi
     lea janr,    %rdi
     call print
-    lea tmpjanr, %rdi
+    pop %rdi
+    add $256, %rdi
     call print
     
-    lea year,   %rdi
+    push %rdi
+    lea year,    %rdi
     call print
-    lea tmpyear, %rdi
+    pop %rdi
+    add $256, %rdi
     call println
+    pop %rdi
     ret
 
 insert_new_record:
@@ -175,39 +167,41 @@ insert_new_record:
 
     mov $560, %rdi
     call new
-    mov %rax, %r8           # pointer to  new buff
+    mov %rax,       %r8     # pointer to  new buff
 
-    movq $0,        (%rax)  # next
+    movq $0,        (%r8)  # next
 
-    lea tmpname,    %rdi    # name
+    lea tmpname,    %rsi    # name
     add $16,        %rax
-    mov %rax,       %rsi
+    mov %rax,       %rdi
     call str_cpy
 
-    lea tmpjanr,    %rdi    # janr
+    lea tmpjanr,    %rsi    # janr
     add $256,       %rax
-    mov %rax,       %rsi
+    mov %rax,       %rdi
     call str_cpy
 
-    lea tmpyear,    %rdi    # year
+    lea tmpyear,    %rsi    # year
     add $256,       %rax
-    mov %rax,       %rsi
+    mov %rax,       %rdi
+    call str_cpy
 
     movq (last),    %rax
     cmp $0,         %rax
     jnz insert_new_record_non_empty
     #empty
-    mov %r8,        (%rax)
-#    add $8,         %rax
-    movq $0,        8(%rax)
+    movq $0,         8(%r8)  # set prev
+    movq %r8,        (last)
+    movq %r8,        (head)
     jmp insert_new_record_exit
 insert_new_record_non_empty:
-    mov (%rax),     %r9     # current last objet (filed 'next')
-    mov %r8,       (%r9)
-
-    mov %r9,        (%r8)
-    mov %rax,      8(%r8)
-    movq %r8,      (last)
+    # %rax - last; %r8 - new
+    # 1. last->next = %r8
+    # 2. %r8->prev = last
+    # 3. last = %r8
+    movq %r8,    (%rax)  # 1
+    movq %rax,   8(%r8)  # 2
+    movq %r8,    (last)  # 3
 
 insert_new_record_exit:
     pop %r9

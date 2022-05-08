@@ -22,7 +22,7 @@ exit_strlen:
 ####################################################################
 # IN:
 # %rdi - dst
-# %rsi - rst
+# %rsi - src
 # OUT:
 # %rax = 0
 .global str_cpy
