@@ -30,7 +30,6 @@ str_cpy:
 	#enter
 	push %rdi
 	push %rsi
-	push %rax
 str_cpy_loop:
 	xor %rax,	%rax
 	mov (%rsi),	%al
@@ -42,7 +41,7 @@ str_cpy_loop:
 	jmp str_cpy_loop
 
 str_cpy_exit:
-	pop %rax
+	xor %rax, %rax
 	pop %rdi
 	pop %rsi
 	#leave
@@ -84,4 +83,55 @@ str2int:
 	pop  %r11
 	pop  %r10
 	pop  %rdi
+	ret
+
+####################################################################
+# IN:
+# %rdi - s1
+# %rsi - s2
+# OUT:
+# %rax = -1 (s1<s2), 0 (s1==s2), 1 (s1>s2)
+.global str_cmp
+str_cmp:
+	push %rdi
+	push %rsi
+	push %rbx
+	push %rcx
+
+	xor %rax, %rax
+loop_str_cmp:
+	###############################
+	# check the end of strings
+	cmp $0, %rdi
+	jnz   str_cmp_end_continue
+	# s1 is \0
+	cmp $0, %rsi
+	jz str_cmp_exit
+	jmp s1_less_s2
+str_cmp_end_continue:
+	cmp $0, %rsi
+	jz s1_greate_s2
+	# check the end of strings
+	###############################
+
+	movb (%rdi), %bl
+	movb (%rsi), %cl
+	cmpb %bl, %cl
+	jb	s1_less_s2
+	ja  s1_greate_s2
+
+	inc %rdi
+	inc %rsi
+	jmp loop_str_cmp
+
+s1_greate_s2:
+	inc %rax
+	jmp str_cmp_exit
+s1_less_s2:
+	dec %rax
+str_cmp_exit:
+	pop %rcx
+	pop %rbx
+	pop %rdi
+	pop %rsi
 	ret

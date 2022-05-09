@@ -8,7 +8,7 @@ lab-gal-1_2.o:  lab-gal-1_2.s
 	as --64 -g lab-gal-1_2.s -o lab-gal-1_2.o
 
 
-main.o: main.o
+main.o: main.s
 	as --64 -g main.s -o main.o
 stdlib.o: stdlib.s
 	as --64 -g stdlib.s -o stdlib.o
@@ -27,4 +27,4 @@ test.o: test.s
 clean:
 	rm -rf *.o
 	rm -rf try_stdlib
-	rm -rf lab-gal-1_3
+	rm -rf lab-gal-1_2
