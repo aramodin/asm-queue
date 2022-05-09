@@ -24,6 +24,9 @@ year:
 empty_stack:
     .asciz "<< Сеэк пуст >>\n"
 
+record_is_notfound:
+    .asciz "\n-----------------------\nТакой записи не найдено\n-----------------------\n\n"
+
 head:
     .quad 0
 last:
@@ -59,6 +62,8 @@ main_loop:
     jz bye
     cmpb $'1', (%rsi)
     jz add_new_record
+    cmpb $'2', (%rsi)
+    jz find_a_record
     cmpb $'4', (%rsi)
     jz print_all
     jmp main_loop
@@ -147,7 +152,7 @@ print_one_record:
     lea year,    %rdi
     call print
     pop %rdi
-    add $256, %rdi
+    add $256,    %rdi
     call println
     pop %rdi
     ret
@@ -208,3 +213,53 @@ insert_new_record_exit:
     pop %r8
     pop %rdi
     ret
+
+################################################################################
+find_a_record:
+    push %rsi
+    push %rdi
+    push %r9
+
+    lea  name,    %rdi
+    call print
+    mov  $31,     %rdi   # длина буфера
+    lea  tmpname, %rsi   # адрес буфера
+    call read
+
+    movq (head),     %r9    # current record
+    cmp $0,          %r9
+    lea empty_stack, %rdi
+    call print
+    jmp l_find_a_record_exit
+
+find_a_record_loop:
+    mov %r9,      %rdi
+    add $16,      %rdi
+    ########################
+    # %rsi <- s1; %rdi <- s2
+    call str_cmp
+    cmp $0,       %rax
+    jz l_found_a_record
+
+    # go to the next record
+    add $560,     %r9
+    cmp $0,       %r9
+    jnz find_a_record_loop 
+
+# record npt found
+    lea record_is_notfound, %rdi
+    call print
+    xor  %rax,    %rax
+    jmp l_find_a_record_exit
+
+l_found_a_record:
+    mov %rax,     %rdi
+    call print_one_record
+l_find_a_record_exit:
+    pop %r9
+    pop %rdi
+    pop %rsi
+    jmp main_loop
+#
+#
+################################################################################
