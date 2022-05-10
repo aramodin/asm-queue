@@ -102,14 +102,14 @@ str_cmp:
 loop_str_cmp:
 	###############################
 	# check the end of strings
-	cmp $0, %rdi
+	cmpb $0, (%rdi)
 	jnz   str_cmp_end_continue
 	# s1 is \0
-	cmp $0, %rsi
+	cmpb $0, (%rsi)
 	jz str_cmp_exit
 	jmp s1_less_s2
 str_cmp_end_continue:
-	cmp $0, %rsi
+	cmpb $0, (%rsi)
 	jz s1_greate_s2
 	# check the end of strings
 	###############################
@@ -132,6 +132,6 @@ s1_less_s2:
 str_cmp_exit:
 	pop %rcx
 	pop %rbx
-	pop %rdi
 	pop %rsi
+	pop %rdi
 	ret

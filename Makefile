@@ -1,8 +1,8 @@
-try_stdlib:	main.o stdlib.o string.o stack.o memory.o test.o
-	ld main.o stdlib.o string.o stack.o memory.o test.o -o try_stdlib
-
 lab-gal-1_2: lab-gal-1_2.o stdlib2.o string.o memory.o
 	ld lab-gal-1_2.o stdlib2.o string.o memory.o -o lab-gal-1_2
+
+try_stdlib:	main.o stdlib.o string.o stack.o memory.o test.o
+	ld main.o stdlib.o string.o stack.o memory.o test.o -o try_stdlib
 
 lab-gal-1_2.o:  lab-gal-1_2.s
 	as --64 -g lab-gal-1_2.s -o lab-gal-1_2.o

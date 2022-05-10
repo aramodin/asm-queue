@@ -26,6 +26,8 @@ empty_stack:
 
 record_is_notfound:
     .asciz "\n-----------------------\nТакой записи не найдено\n-----------------------\n\n"
+record_is_found:
+    .asciz "\n-----------------------\nЗапись найдена:\n"
 
 head:
     .quad 0
@@ -63,7 +65,7 @@ main_loop:
     cmpb $'1', (%rsi)
     jz add_new_record
     cmpb $'2', (%rsi)
-    jz find_a_record
+    jz find_a_record_function
     cmpb $'4', (%rsi)
     jz print_all
     jmp main_loop
@@ -179,16 +181,18 @@ insert_new_record:
     lea tmpname,    %rsi    # name
     add $16,        %rax
     mov %rax,       %rdi
+    push %rdi
     call str_cpy
 
     lea tmpjanr,    %rsi    # janr
-    add $256,       %rax
-    mov %rax,       %rdi
+    pop %rdi
+    add $256,       %rdi
+    push %rdi
     call str_cpy
 
     lea tmpyear,    %rsi    # year
-    add $256,       %rax
-    mov %rax,       %rdi
+    pop %rdi
+    add $256,       %rdi
     call str_cpy
 
     movq (last),    %rax
@@ -215,6 +219,10 @@ insert_new_record_exit:
     ret
 
 ################################################################################
+find_a_record_function:
+    call find_a_record
+    jmp main_loop
+
 find_a_record:
     push %rsi
     push %rdi
@@ -228,11 +236,13 @@ find_a_record:
 
     movq (head),     %r9    # current record
     cmp $0,          %r9
+    jnz find_a_record_loop
     lea empty_stack, %rdi
     call print
     jmp l_find_a_record_exit
 
 find_a_record_loop:
+    push %r9
     mov %r9,      %rdi
     add $16,      %rdi
     ########################
@@ -242,24 +252,28 @@ find_a_record_loop:
     jz l_found_a_record
 
     # go to the next record
+    pop %r9
     add $560,     %r9
     cmp $0,       %r9
     jnz find_a_record_loop 
 
-# record npt found
+# record not found
     lea record_is_notfound, %rdi
     call print
     xor  %rax,    %rax
     jmp l_find_a_record_exit
 
 l_found_a_record:
-    mov %rax,     %rdi
+    lea record_is_found, %rdi
+    call print
+    pop %rdi
     call print_one_record
+    mov %rdi, %rax
 l_find_a_record_exit:
     pop %r9
     pop %rdi
     pop %rsi
-    jmp main_loop
+    ret
 #
 #
 ################################################################################
