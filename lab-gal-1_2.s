@@ -230,7 +230,7 @@ find_a_record:
 
     lea  name,    %rdi
     call print
-    mov  $31,     %rdi   # длина буфера
+    mov  $255,    %rdi   # длина буфера
     lea  tmpname, %rsi   # адрес буфера
     call read
 
@@ -242,7 +242,6 @@ find_a_record:
     jmp l_find_a_record_exit
 
 find_a_record_loop:
-    push %r9
     mov %r9,      %rdi
     add $16,      %rdi
     ########################
@@ -252,12 +251,13 @@ find_a_record_loop:
     jz l_found_a_record
 
     # go to the next record
-    pop %r9
-    add $560,     %r9
-    cmp $0,       %r9
-    jnz find_a_record_loop 
+    cmpq $0,     (%r9)
+    jz record_not_found
+    mov  %r9,    %rdi
+    movq  (%rdi), %r9
+    jmp find_a_record_loop
 
-# record not found
+record_not_found:
     lea record_is_notfound, %rdi
     call print
     xor  %rax,    %rax
