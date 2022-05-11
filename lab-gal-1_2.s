@@ -27,6 +27,9 @@ year:
 empty_stack:
     .asciz "<< Сеэк пуст >>\n"
 
+has_been_sorted:
+    .asciz "\n\n++ Стэк отсортирован ++\n\n"
+
 record_is_notfound:
     .asciz "\n-----------------------\nТакой записи не найдено\n-----------------------\n\n"
 record_is_found:
@@ -69,6 +72,8 @@ main_loop:
     jz add_new_record
     cmpb $'2', (%rsi)
     jz find_a_record_function
+    cmpb $'3', (%rsi)
+    jz sort_the_list
     cmpb $'4', (%rsi)
     jz print_all
     cmpb $'5', (%rsi)
@@ -344,3 +349,41 @@ exit_delete_one_record:
     pop %r9
     pop %r8
     ret
+
+################################################################################
+NOT READY
+sort_the_list:
+    movq (head),     %r9    # current record
+    cmp $0,          %r9
+    jnz do_sort_the_list
+    lea empty_stack, %rdi
+    call print
+
+exit_sort_the_list:
+    jmp main_loop
+
+do_sort_the_list:
+    movq (%r9), %r10
+    cmpq $0,    %r10
+    jz has_been_sorted
+    mov 16(%r9),  %rsi
+    mov 16(%r10), %rdi
+    call str_cmp
+    ja sort_the_list_swap
+    mov %r10, %r9
+    jmp do_sort_the_list
+
+sort_the_list_swap:
+    cmpq $0,  (%r9)
+    jz swap_first_and_second
+
+jz swap_first_and_second:
+    mov %r10, (head)
+
+    movq (head),     %r9
+    jmp do_sort_the_list
+
+has_been_sorted:
+    lea has_been_sorted, %rdi
+    call print
+    jump exit_sort_the_list
