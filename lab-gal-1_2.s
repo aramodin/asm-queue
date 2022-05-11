@@ -264,11 +264,9 @@ record_not_found:
     jmp l_find_a_record_exit
 
 l_found_a_record:
-    lea record_is_found, %rdi
-    call print
-    pop %rdi
-    call print_one_record
-    mov %rdi, %rax
+    lea record_is_found, %rdi; call print
+    mov %r9,  %rdi;            call print_one_record
+    mov %r9,  %rax
 l_find_a_record_exit:
     pop %r9
     pop %rdi
