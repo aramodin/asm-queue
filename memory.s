@@ -52,20 +52,18 @@ exit_new:
 # OUT:
 # 
 delete:
-    #enter
     push %r11   # because of the syscal
     push %rcx   # because of the syscal
-    push %rdi
+    push %rax
 
     # закрыть отображение
-    mov %rdi,   %rax
-    sub $8,     %rax  
-    mov (%rax), %rsi  # длина отображенной области
+    sub $8,     %rdi  # pointer - %rdi
+    mov (%rdi), %rsi  # длина отображенной области
     mov $11,    %rax  # номер системного вызова
     syscall
 
-    pop %rdi
+    pop %rax
     pop %rcx
     pop %r11
-    #leave
+    xor %rdi, %rdi
     ret

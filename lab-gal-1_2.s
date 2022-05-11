@@ -3,7 +3,7 @@
 greetings:
 	.asciz "\nHello! :)\n\nЛабораторная работа номер 2 (класс стэк)\n\n"
 menu:
-	.asciz "1. Добавить в список(add)\n2. Найти элемент(find)\n3. Отсортировать(sort)\n4. Распечатать(print)\n0. Выход(exit)\n> "
+	.asciz "-------------------------\n1. Добавить в список(add)\n2. Найти элемент(find)\n3. Отсортировать(sort)\n4. Распечатать(print)\n-------------------------\n5. Удаление(delete)\n-------------------------\n0. Выход(exit)\n> "
 separate_line:
     .asciz "-------------------------\n"
 menu_1:
@@ -14,6 +14,9 @@ menu_3:
     .asciz "3. Сортировка\n"
 menu_4:
     .asciz "4. Печать\n"
+menu_5:
+    .asciz "5. Удаление\n"
+
 name:
     .asciz "Имя: "
 janr:
@@ -68,6 +71,8 @@ main_loop:
     jz find_a_record_function
     cmpb $'4', (%rsi)
     jz print_all
+    cmpb $'5', (%rsi)
+    jz print_delete_record
     jmp main_loop
 
 
@@ -221,6 +226,16 @@ insert_new_record_exit:
 ################################################################################
 find_a_record_function:
     call find_a_record
+    cmp $0, %rax
+    jz exit_find_a_record_function
+    push %r9 
+    mov %rax, %r9
+    lea record_is_found, %rdi
+    call print
+    mov %r9,  %rdi
+    call print_one_record
+    pop %r9
+exit_find_a_record_function:
     jmp main_loop
 
 find_a_record:
@@ -264,8 +279,6 @@ record_not_found:
     jmp l_find_a_record_exit
 
 l_found_a_record:
-    lea record_is_found, %rdi; call print
-    mov %r9,  %rdi;            call print_one_record
     mov %r9,  %rax
 l_find_a_record_exit:
     pop %r9
@@ -275,3 +288,59 @@ l_find_a_record_exit:
 #
 #
 ################################################################################
+
+
+print_delete_record:
+    call find_a_record
+    cmp $0, %rax
+    jz exit_print_delete_record
+    push %rdi
+    mov %rax, %rdi
+    call delete_one_record
+    pop %rdi
+exit_print_delete_record:
+    jmp main_loop
+
+# %rdi - current
+delete_one_record:
+    push %r8            # next
+    push %r9            # prev
+    push %r10
+
+    mov (%rdi),   %r8
+    mov 8(%rdi),  %r9
+
+    cmp $0,       %r8   # means %rdi is last
+    jz delete_last_record 
+    cmp $0,       %r9   # means %rdi is first and not last
+    jz delete_the_first_record
+    # we are in the middle of the list
+    mov %r8,     (%r9)   # prev->next = current->next
+    mov 8(%rdi), %r10
+    mov %r10,    8(%r8)  # next->prev = current->prev
+    call delete
+    jmp exit_delete_one_record
+
+delete_the_first_record:
+    mov %r8, (head)
+    movq $0,  8(%r8)
+    call delete              # %rdi
+    jmp exit_delete_one_record
+
+delete_last_record:
+    cmp $0, %r9
+    jz delete_the_only_last_record
+    mov %r9, (last)
+    movq $0, (%r9)
+    call delete              # %rdi
+    jmp exit_delete_one_record
+delete_the_only_last_record:
+    movq $0, (head)
+    movq $0, (last)
+    call delete              # %rdi
+
+exit_delete_one_record:
+    pop %r10
+    pop %r9
+    pop %r8
+    ret
