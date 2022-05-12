@@ -351,39 +351,41 @@ exit_delete_one_record:
     ret
 
 ################################################################################
-NOT READY
+#NOT READY
 sort_the_list:
-    movq (head),     %r9    # current record
-    cmp $0,          %r9
-    jnz do_sort_the_list
-    lea empty_stack, %rdi
-    call print
-
-exit_sort_the_list:
     jmp main_loop
 
-do_sort_the_list:
-    movq (%r9), %r10
-    cmpq $0,    %r10
-    jz has_been_sorted
-    mov 16(%r9),  %rsi
-    mov 16(%r10), %rdi
-    call str_cmp
-    ja sort_the_list_swap
-    mov %r10, %r9
-    jmp do_sort_the_list
+#    movq (head),     %r9    # current record
+#    cmp $0,          %r9
+#    jnz do_sort_the_list
+#    lea empty_stack, %rdi
+#    call print
 
-sort_the_list_swap:
-    cmpq $0,  (%r9)
-    jz swap_first_and_second
+#exit_sort_the_list:
+#    jmp main_loop
 
-jz swap_first_and_second:
-    mov %r10, (head)
+#do_sort_the_list:
+#    movq (%r9), %r10
+#    cmpq $0,    %r10
+#    jz has_been_sorted
+#    mov 16(%r9),  %rsi
+#    mov 16(%r10), %rdi
+#    call str_cmp
+#    ja sort_the_list_swap
+#    mov %r10, %r9
+#    jmp do_sort_the_list
 
-    movq (head),     %r9
-    jmp do_sort_the_list
+#sort_the_list_swap:
+#    cmpq $0,  (%r9)
+#    jz swap_first_and_second
 
-has_been_sorted:
-    lea has_been_sorted, %rdi
-    call print
-    jump exit_sort_the_list
+#jz swap_first_and_second:
+#    mov %r10, (head)
+
+#    movq (head),     %r9
+#    jmp do_sort_the_list
+
+#has_been_sorted:
+#    lea has_been_sorted, %rdi
+#    call print
+#    jump exit_sort_the_list
