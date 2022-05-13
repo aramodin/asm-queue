@@ -56,6 +56,4 @@ int main(){
     printf("%s\n", s2);
     return 0;
 }
-view raw
-cs4000.c hosted with ❤ by GitHub
 
