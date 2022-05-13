@@ -1,4 +1,3 @@
-try_stdlib
-lab-gal-1_2
+lab-1_2
 *.o
 .vscode
