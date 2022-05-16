@@ -1,6 +1,6 @@
 .text
 
-.global new, delete
+.global new, delete, memmove
 
 # IN:
 # %rdi - number of needed bytes
@@ -66,4 +66,26 @@ delete:
     pop %rcx
     pop %r11
     xor %rdi, %rdi
+    ret
+
+# IN:
+# %rdi - pointer to the dst
+# %rsi - pointer to the src
+# %rdx - bumber of bytes
+# OUT:
+# 
+# TODO: to rework then
+memmove:
+    push %rax
+    push %rdx
+
+_l_memmove:
+    dec %rdx
+    movb (%rsi,%rdx,1), %al
+    movb %al, (%rdi,%rdx,1)
+    cmp $0, %rdx
+    jnz _l_memmove
+
+    pop %rdx
+    pop %rax
     ret

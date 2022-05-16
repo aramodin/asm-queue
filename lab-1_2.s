@@ -353,39 +353,68 @@ exit_delete_one_record:
 ################################################################################
 #NOT READY
 sort_the_list:
+    call do_sort_the_list
     jmp main_loop
 
-#    movq (head),     %r9    # current record
-#    cmp $0,          %r9
-#    jnz do_sort_the_list
-#    lea empty_stack, %rdi
-#    call print
+do_sort_the_list:
+    push %r9
+    push %r10
+    push %rdi
+    push %rsi
 
-#exit_sort_the_list:
-#    jmp main_loop
+    movq (head),  %r9    # current record
+    movq (last),  %r10
+    cmp  %r10,    %r9
+    jnz sort_the_list__nonempty
+    lea empty_stack, %rdi
+    call print
 
-#do_sort_the_list:
-#    movq (%r9), %r10
-#    cmpq $0,    %r10
-#    jz has_been_sorted
-#    mov 16(%r9),  %rsi
-#    mov 16(%r10), %rdi
-#    call str_cmp
-#    ja sort_the_list_swap
-#    mov %r10, %r9
-#    jmp do_sort_the_list
+    jmp exit_sort_the_list
 
-#sort_the_list_swap:
-#    cmpq $0,  (%r9)
-#    jz swap_first_and_second
+sort_the_list__nonempty:
+    movq (%r9), %r10    # %r10 - next
+    cmpq $0,    %r10
+    jz print_has_been_sorted
+    mov 16(%r9),  %rsi
+    mov 16(%r10), %rdi
+    call str_cmp
+    ja sort_the_list__swap
+    mov %r10, %r9
+    jmp sort_the_list__nonempty
 
-#jz swap_first_and_second:
-#    mov %r10, (head)
+sort_the_list__swap:
+    ################
+    # 1. swap name #
+    # 2. swap janr #
+    # 3. swap year #
+    ################
 
-#    movq (head),     %r9
-#    jmp do_sort_the_list
+    # 1
+    lea name,     %rdi
+    mov %r10,     %rsi
+    add $16,      %rsi
+    mov $256,     %rdx
+    call memmove
+    mov %rdi,     %rsi  # now, it's src, was dst for next->name
+    mov %r9,      %rdi
+    add $16,      %rdi
+#    mov $256,     %rdx  # already set above
+    call memmove
 
-#has_been_sorted:
-#    lea has_been_sorted, %rdi
-#    call print
-#    jump exit_sort_the_list
+   # 2
+
+   # 3
+
+   movq (head),  %r9
+   jmp sort_the_list__nonempty
+
+print_has_been_sorted:
+    lea has_been_sorted, %rdi
+    call print
+
+exit_sort_the_list:
+    pop %rsi
+    pop %rdi
+    pop %r10
+    pop %r9
+    ret
