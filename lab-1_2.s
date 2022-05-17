@@ -359,6 +359,7 @@ sort_the_list:
 do_sort_the_list:
     push %r9
     push %r10
+    push %r11
     push %rdi
     push %rsi
 
@@ -375,8 +376,14 @@ sort_the_list__nonempty:
     movq (%r9), %r10    # %r10 - next
     cmpq $0,    %r10
     jz print_has_been_sorted
-    mov 16(%r9),  %rsi
-    mov 16(%r10), %rdi
+    #mov 16(%r9),  %rsi   # не понятность
+    #mov 16(%r10), %rdi
+    mov (%r9),  %rsi
+    add $16,    %rsi
+    mov (%r10), %r11
+    add $16,    %r11
+    mov %r11,   %rdi
+
     call str_cmp
     ja sort_the_list__swap
     mov %r10, %r9
@@ -415,6 +422,7 @@ print_has_been_sorted:
 exit_sort_the_list:
     pop %rsi
     pop %rdi
+    pop %r11
     pop %r10
     pop %r9
     ret
