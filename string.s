@@ -135,3 +135,26 @@ str_cmp_exit:
 	pop %rsi
 	pop %rdi
 	ret
+
+####################################################################
+# IN:
+# %rdi - pointer to buf with string ending by '\n'
+# OUT:
+#
+.global terminate_string
+terminate_string:
+	push %rdx
+	push %rax
+
+	xor %rdx, %rdx		# index
+terminate_string_loop:
+	movb (%rdi,%rdx), %al
+	cmp $0x0a, %al
+	jz exit_terminate_string
+	inc %rdx
+	jmp terminate_string_loop
+exit_terminate_string:
+    movb $0, (%rdi,%rdx)
+	pop %rax
+	pop %rdx
+	ret

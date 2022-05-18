@@ -18,11 +18,11 @@ menu_5:
     .asciz "5. Удаление\n"
 
 name:
-    .asciz "Имя: "
+    .asciz "\nИмя: "
 janr:
-    .asciz "Жанр: "
+    .asciz "\nЖанр: "
 year:
-    .asciz "Год: "
+    .asciz "\nГод: "
 
 empty_stack:
     .asciz "<< Сеэк пуст >>\n"
@@ -100,18 +100,24 @@ add_new_record:
     mov  $255,          %rdi   # длина буфера
     lea  tmpname,       %rsi   # адрес буфера
     call read
+    mov  %rsi, %rdi
+    call terminate_string
 
     lea janr,           %rdi
     call print
     mov  $255,          %rdi   # длина буфера
     lea  tmpjanr,       %rsi   # адрес буфера
     call read
+    mov  %rsi, %rdi
+    call terminate_string
 
     lea year,           %rdi
     call print
     mov  $31,           %rdi   # длина буфера
     lea  tmpyear,       %rsi   # адрес буфера
     call read
+    mov  %rsi, %rdi
+    call terminate_string
 
     lea separate_line,  %rdi
     call print
