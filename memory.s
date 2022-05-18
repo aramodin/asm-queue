@@ -1,6 +1,6 @@
 .text
 
-.global new, delete, memmove
+.global new, delete, memmove, memswap
 
 # IN:
 # %rdi - number of needed bytes
@@ -71,7 +71,7 @@ delete:
 # IN:
 # %rdi - pointer to the dst
 # %rsi - pointer to the src
-# %rdx - bumber of bytes
+# %rdx - number of bytes
 # OUT:
 # 
 # TODO: to rework then
@@ -92,4 +92,45 @@ _l_memmove:
     pop %rdi
     pop %rdx
     pop %rax
+    ret
+
+# IN:
+# %rdi - pointer to 1
+# %rsi - pointer to 2
+# %rdx - number of bytes
+# %rcx - tmpbuf
+# OUT:
+# 
+memswap:
+    push %rdi
+    push %rsi
+    push %rdx
+    push %rcx
+    push %r8
+    push $r9
+
+    mov %rdi,     %r8   # copy pointer '1' to %r8
+    mov %rsi,     $r9   # '2' to %r9
+
+    #1  '2' -> buf
+    mov %rcx,     %rdi  # dst (buf)
+                        # src ('1')
+    call memmove
+
+    #2 '1' -> '2
+    mov %r8,     %rdi  # dst '1'
+    mov %r9,     %rsi
+    call memmove
+
+    #3 buf ('2') -> '1'
+    mov %r8,      %rdi
+    mov %rcx,     %rsi
+    call memmove
+
+    pop %r9
+    pop %r8
+    pop %rcx
+    pop %rdx
+    pop %rsi
+    pop %rdi
     ret
