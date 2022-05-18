@@ -78,6 +78,8 @@ delete:
 memmove:
     push %rax
     push %rdx
+    push %rdi
+    push %rsi
 
 _l_memmove:
     dec %rdx
@@ -86,6 +88,8 @@ _l_memmove:
     cmp $0, %rdx
     jnz _l_memmove
 
+    pop %rsi
+    pop %rdi
     pop %rdx
     pop %rax
     ret

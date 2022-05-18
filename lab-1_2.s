@@ -378,14 +378,14 @@ sort_the_list__nonempty:
     jz print_has_been_sorted
     #mov 16(%r9),  %rsi   # не понятность
     #mov 16(%r10), %rdi
-    mov (%r9),  %rsi
-    add $16,    %rsi
-    mov (%r10), %r11
-    add $16,    %r11
-    mov %r11,   %rdi
+    mov %r10,   %rsi    # point ot the next
+    add $16,    %rsi    # next->name
+    mov %r9   , %r11    # this
+    add $16,    %r11    # this->name
+    mov %r11,   %rdi    # -//-
 
-    call str_cmp
-    ja sort_the_list__swap
+    call str_cmp        # next-> name vs this->name
+    jb sort_the_list__swap
     mov %r10, %r9
     jmp sort_the_list__nonempty
 
@@ -397,12 +397,23 @@ sort_the_list__swap:
     ################
 
     # 1
-    lea name,     %rdi
-    mov %r10,     %rsi
-    add $16,      %rsi
+    # safe next->name to tmp
+    lea tmpname,  %rdi  # dst
+    mov %r10,     %rsi  # src
+    add $16,      %rsi  # next->name
     mov $256,     %rdx
     call memmove
-    mov %rdi,     %rsi  # now, it's src, was dst for next->name
+
+    # copy this->name --> next->name
+    mov %rsi,    %rdi  # dst - next->name
+    mov %r9,     %rsi
+    add $16,     %rsi  # src - this->name
+#    mov $256,     %rdx  # already set above
+    call memmove
+
+    # copy tmp --> this->name
+#    mov %rdi,     %rsi  # now, it's src, was dst for next->name
+    lea tmpname,  %rsi
     mov %r9,      %rdi
     add $16,      %rdi
 #    mov $256,     %rdx  # already set above
