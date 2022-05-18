@@ -396,35 +396,34 @@ sort_the_list__swap:
     # 3. swap year #
     ################
 
+    # memswap
+    # %rdi - pointer to 1
+    # %rsi - pointer to 2
+    # %rdx - number of bytes
+    # %rcx - tmpbuf
+
     # 1
-    # safe next->name to tmp
-    lea tmpname,  %rdi  # dst
-    mov %r10,     %rsi  # src
-    add $16,      %rsi  # next->name
-    mov $256,     %rdx
-    call memmove
+    mov %r9,  %rdi
+    add $16,  %rdi
+    mov %r10, %rsi
+    add $16,  %rsi
+    mov $256, %rdx
+    lea tmpname, %rcx
+    call memswap
 
-    # copy this->name --> next->name
-    mov %rsi,    %rdi  # dst - next->name
-    mov %r9,     %rsi
-    add $16,     %rsi  # src - this->name
-#    mov $256,     %rdx  # already set above
-    call memmove
+    # 2
+    add $256, %rdi
+    add $256, %rsi
+    call memswap
 
-    # copy tmp --> this->name
-#    mov %rdi,     %rsi  # now, it's src, was dst for next->name
-    lea tmpname,  %rsi
-    mov %r9,      %rdi
-    add $16,      %rdi
-#    mov $256,     %rdx  # already set above
-    call memmove
+    # 3
+    add $256, %rdi
+    add $256, %rsi
+    mov $32,  %rdx
+    call memswap
 
-   # 2
-
-   # 3
-
-   movq (head),  %r9
-   jmp sort_the_list__nonempty
+    movq (head),  %r9
+    jmp sort_the_list__nonempty
 
 print_has_been_sorted:
     lea has_been_sorted, %rdi

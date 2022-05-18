@@ -107,24 +107,24 @@ memswap:
     push %rdx
     push %rcx
     push %r8
-    push $r9
+    push %r9
 
     mov %rdi,     %r8   # copy pointer '1' to %r8
-    mov %rsi,     $r9   # '2' to %r9
+    mov %rsi,     %r9   # '2' to %r9
 
     #1  '2' -> buf
     mov %rcx,     %rdi  # dst (buf)
-                        # src ('1')
+                        # src ('2')
     call memmove
 
     #2 '1' -> '2
-    mov %r8,     %rdi  # dst '1'
-    mov %r9,     %rsi
+    mov %r9,     %rdi  # dst '2'
+    mov %r8,     %rsi  # src '1'
     call memmove
 
     #3 buf ('2') -> '1'
-    mov %r8,      %rdi
-    mov %rcx,     %rsi
+    mov %r8,      %rdi # dst '1'
+    mov %rcx,     %rsi # src buf ('2')
     call memmove
 
     pop %r9
