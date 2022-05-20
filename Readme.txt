@@ -33,6 +33,13 @@ syscall:
 https://code-examples.net/ru/q/26b235
 
 
+командная строка (Lixux x86-64)
+(%rsp) -> number of arguments
+8(%rsp) -> address of the name of the executable
+16(%rsp) -> address of the first command line argument (if exists)
+... so on ...
+
+
 вход и выход из функции:
 # сохраняем EBP, копируем ESP в EBP "выделяем" 16 байт
 (10+ тактов) enter 16, 0 ==  (1 такт?) push %ebp;  mov %esp, %ebp; sub $16, %esp
